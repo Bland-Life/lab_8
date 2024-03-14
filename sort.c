@@ -32,8 +32,9 @@ size_t Size(void* ptr)
 void mergeSort(int pData[], int l, int r)
 {
 	int mid = (r + l) / 2 + 1;
+	
+	// If there are only two items, sort them
 	if (mid == l || mid == r) {
-		printf("%d %d\n", r, l);
 		if (pData[l] > pData[r]) {
 			int temp = pData[l];
 			pData[l] = pData[r];
@@ -42,14 +43,18 @@ void mergeSort(int pData[], int l, int r)
 		return;
 	}
 	else {
-		mergeSort(pData, l, mid);
+		mergeSort(pData, l, mid - 1);
 		mergeSort(pData, mid, r);
+
+		// Creates the two sub arrays for the left and right
 		int* sub_arr1 = Alloc(sizeof(int*) * (mid - l));
 		int* sub_arr2 = Alloc(sizeof(int*) * (r - mid));
 
 		int i;
 		int j;
 		i = j = 0;
+
+		// Populates the two arrays
 		for (i; i < mid - l; i++) {
 			sub_arr1[i] = pData[l + i];
 		}
@@ -60,6 +65,11 @@ void mergeSort(int pData[], int l, int r)
 
 		i = j = 0;
 		int p = l;
+
+		// While both arrays have items, use a section of the original array as a merge array
+		// Using the section, if the item of the first subarray is less than the second, insert
+		// it into the appropriate position in the section of the original, otherwise insert
+		// the item from the second subarray
 		while (i < mid - l && j <= r - mid) {
 			if (sub_arr1[i] <= sub_arr2[j]) {
 				pData[p] = sub_arr1[i];
@@ -73,6 +83,7 @@ void mergeSort(int pData[], int l, int r)
 			}
 		}
 
+		// If there is an array that still has items, simply add the remaining items
 		while (i < mid - l) {
 			pData[p] = sub_arr1[i];
 			i++;
@@ -85,22 +96,6 @@ void mergeSort(int pData[], int l, int r)
 			p++;
 		}
 
-		for (int n = 0; n < mid - l; n++) {
-			printf("%d ", sub_arr1[n]);
-		}
-
-		printf("     ");
-
-		for (int n = 0; n <= r - mid; n++) {
-			printf("%d ", sub_arr2[n]);
-		}
-
-		printf("\n");
-
-		for(int n = 0; n < 10; n++) {
-			printf("%d ", pData[n]);
-		}
-		printf("\n\n");
 		DeAlloc(sub_arr1);
 		DeAlloc(sub_arr2);
 	}
