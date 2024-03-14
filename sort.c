@@ -10,7 +10,7 @@ void *Alloc(size_t sz)
 	extraMemoryAllocated += sz;
 	size_t* ret = malloc(sizeof(size_t) + sz);
 	*ret = sz;
-	printf("Extra memory allocated, size: %ld\n", sz);
+	// printf("Extra memory allocated, size: %ld\n", sz);
 	return &ret[1];
 }
 
@@ -18,7 +18,7 @@ void DeAlloc(void* ptr)
 {
 	size_t* pSz = (size_t*)ptr - 1;
 	extraMemoryAllocated -= *pSz;
-	printf("Extra memory deallocated, size: %ld\n", *pSz);
+	// printf("Extra memory deallocated, size: %ld\n", *pSz);
 	free((size_t*)ptr - 1);
 }
 
@@ -31,24 +31,14 @@ size_t Size(void* ptr)
 // extraMemoryAllocated counts bytes of extra memory allocated
 void mergeSort(int pData[], int l, int r)
 {
-	int mid = (r + l) / 2 + 1;
-	
-	// If there are only two items, sort them
-	if (mid == l || mid == r) {
-		if (pData[l] > pData[r]) {
-			int temp = pData[l];
-			pData[l] = pData[r];
-			pData[r] = temp;
-		}
-		return;
-	}
-	else {
+	if (l < r) {
+		int mid = ((l + r) / 2 + 1);
 		mergeSort(pData, l, mid - 1);
 		mergeSort(pData, mid, r);
 
 		// Creates the two sub arrays for the left and right
 		int* sub_arr1 = Alloc(sizeof(int*) * (mid - l));
-		int* sub_arr2 = Alloc(sizeof(int*) * (r - mid));
+		int* sub_arr2 = Alloc(sizeof(int*) * (r - mid + 1));
 
 		int i;
 		int j;
@@ -99,6 +89,7 @@ void mergeSort(int pData[], int l, int r)
 		DeAlloc(sub_arr1);
 		DeAlloc(sub_arr2);
 	}
+
 }
 
 // parses input file to an integer array
