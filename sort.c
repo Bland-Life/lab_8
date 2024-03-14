@@ -10,7 +10,7 @@ void *Alloc(size_t sz)
 	extraMemoryAllocated += sz;
 	size_t* ret = malloc(sizeof(size_t) + sz);
 	*ret = sz;
-	printf("Extra memory allocated, size: %ld\n", sz);
+	// printf("Extra memory allocated, size: %ld\n", sz);
 	return &ret[1];
 }
 
@@ -18,7 +18,7 @@ void DeAlloc(void* ptr)
 {
 	size_t* pSz = (size_t*)ptr - 1;
 	extraMemoryAllocated -= *pSz;
-	printf("Extra memory deallocated, size: %ld\n", *pSz);
+	// printf("Extra memory deallocated, size: %ld\n", *pSz);
 	free((size_t*)ptr - 1);
 }
 
@@ -31,6 +31,79 @@ size_t Size(void* ptr)
 // extraMemoryAllocated counts bytes of extra memory allocated
 void mergeSort(int pData[], int l, int r)
 {
+	int mid = (r + l) / 2 + 1;
+	if (mid == l || mid == r) {
+		printf("%d %d\n", r, l);
+		if (pData[l] > pData[r]) {
+			int temp = pData[l];
+			pData[l] = pData[r];
+			pData[r] = temp;
+		}
+		return;
+	}
+	else {
+		mergeSort(pData, l, mid);
+		mergeSort(pData, mid, r);
+		int* sub_arr1 = Alloc(sizeof(int*) * (mid - l));
+		int* sub_arr2 = Alloc(sizeof(int*) * (r - mid));
+
+		int i;
+		int j;
+		i = j = 0;
+		for (i; i < mid - l; i++) {
+			sub_arr1[i] = pData[l + i];
+		}
+
+		for (j; j <= r - mid; j++) {
+			sub_arr2[j] = pData[mid + j];
+		}
+
+		i = j = 0;
+		int p = l;
+		while (i < mid - l && j <= r - mid) {
+			if (sub_arr1[i] <= sub_arr2[j]) {
+				pData[p] = sub_arr1[i];
+				i++;
+				p++;
+			}
+			else {
+				pData[p] = sub_arr2[j];
+				j++;
+				p++;
+			}
+		}
+
+		while (i < mid - l) {
+			pData[p] = sub_arr1[i];
+			i++;
+			p++;
+		}
+
+		while (j <= r - mid) {
+			pData[p] = sub_arr2[j];
+			j++;
+			p++;
+		}
+
+		for (int n = 0; n < mid - l; n++) {
+			printf("%d ", sub_arr1[n]);
+		}
+
+		printf("     ");
+
+		for (int n = 0; n <= r - mid; n++) {
+			printf("%d ", sub_arr2[n]);
+		}
+
+		printf("\n");
+
+		for(int n = 0; n < 10; n++) {
+			printf("%d ", pData[n]);
+		}
+		printf("\n\n");
+		DeAlloc(sub_arr1);
+		DeAlloc(sub_arr2);
+	}
 }
 
 // parses input file to an integer array
@@ -67,19 +140,20 @@ int parseData(char *inputFileName, int **ppData)
 // prints first and last 100 items in the data array
 void printArray(int pData[], int dataSz)
 {
-	int i, sz = dataSz - 100;
-	printf("\tData:\n\t");
-	for (i=0;i<100;++i)
-	{
-		printf("%d ",pData[i]);
-	}
-	printf("\n\t");
-	
-	for (i=sz;i<dataSz;++i)
-	{
-		printf("%d ",pData[i]);
-	}
-	printf("\n\n");
+    int i, sz = (dataSz > 100 ? dataSz - 100 : 0);
+    int firstHundred = (dataSz < 100 ? dataSz : 100);
+    printf("\tData:\n\t");
+    for (i=0;i<firstHundred;++i)
+    {
+        printf("%d ",pData[i]);
+    }
+    printf("\n\t");
+    
+    for (i=sz;i<dataSz;++i)
+    {
+        printf("%d ",pData[i]);
+    }
+    printf("\n\n");
 }
 
 int main(void)
@@ -87,7 +161,7 @@ int main(void)
 	clock_t start, end;
 	int i;
     double cpu_time_used;
-	char* fileNames[] = { "input1.txt", "input2.txt", "input3.txt", "input4.txt" };
+	char* fileNames[] = { "input1.txt", "input2.txt", "input3.txt", "input4.txt"};
 	
 	for (i=0;i<4;++i)
 	{
